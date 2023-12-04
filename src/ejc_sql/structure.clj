@@ -495,15 +495,15 @@
         {:schemas    (fn [& _] "
                     SELECT DISTINCT creator
                     FROM sysibm.systables")
-         :tables     (fn [& {:keys [owner]}]
+         :tables     (fn [& {:keys [schema]}]
                        (format "
                     SELECT name, creator
                     FROM sysibm.systables
                     WHERE %s TYPE = 'T'
                       ORDER BY name"
-                               (if owner
-                                 (format "owner = '%s' AND"
-                                         (s/upper-case owner))
+                               (if schema
+                                 (format "creator = '%s' AND"
+                                         (s/upper-case schema))
                                  "")
                                ))
          :all-tables (fn [& _] "
