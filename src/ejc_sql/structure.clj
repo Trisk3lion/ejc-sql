@@ -492,14 +492,17 @@
         ;;--------
         db2
         ;;--------
-        {:tables     (fn [& {:keys [owner]}]
+        {:schemas    (fn [& _] "
+                    SELECT DISTINCT creator
+                    FROM sysibm.systables")
+         :tables     (fn [& {:keys [owner]}]
                        (format "
                     SELECT name, creator
                     FROM sysibm.systables
                     WHERE %s TYPE = 'T'
                       ORDER BY name"
                                (if owner
-                                 (format "creator = '%s' AND"
+                                 (format "owner = '%s' AND"
                                          (s/upper-case owner))
                                  "")
                                ))
@@ -512,12 +515,11 @@
                     SELECT creator, name
                     FROM sysibm.systables
                     WHERE TYPE = 'V'")
-         :columns    (fn [& {:keys [owner table]}]
+         :columns    (fn [& {:keys [table]}]
                        (format "
-                   SELECT name
+                   SELECT DISTINCT name
                    FROM sysibm.syscolumns
-                   WHERE tbcreator = %s AND
-                   tbname = %s") owner table)
+                   WHERE tbname = '%s'" table))
          }]
     {:oracle     oracle
      :informix   informix
